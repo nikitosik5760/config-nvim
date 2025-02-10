@@ -2,6 +2,10 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 
+-- disable default explorer
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- NOTE: Switch the numbering of the lines
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -252,7 +256,18 @@ require('lazy').setup({
         sections = {
           lualine_a = { 'mode' },
           lualine_b = { 'branch', 'diff', 'diagnostics' },
-          lualine_c = { 'filename' },
+          lualine_c = {
+            {
+              'filename',
+              path = 1,
+              symbols = {
+                modified = '[+]', -- Text to show when the file is modified.
+                readonly = '[-]', -- Text to show when the file is non-modifiable or readonly.
+                unnamed = '', -- Text to show for unnamed buffers.
+                newfile = '[New]', -- Text to show for newly created file before first write
+              },
+            },
+          },
           lualine_x = { 'encoding', 'fileformat', 'filetype' },
           lualine_y = { 'progress' },
           lualine_z = { 'location' },
@@ -269,6 +284,27 @@ require('lazy').setup({
         winbar = {},
         inactive_winbar = {},
         extensions = {},
+      }
+    end,
+  },
+  {
+    'nvim-tree/nvim-tree.lua',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('nvim-tree').setup {
+        sort = {
+          sorter = 'case_sensitive',
+        },
+        view = {
+          width = 30,
+          side = 'right',
+        },
+        renderer = {
+          group_empty = true,
+        },
+        filters = {
+          dotfiles = true,
+        },
       }
     end,
   },
