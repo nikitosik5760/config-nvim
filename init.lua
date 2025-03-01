@@ -22,7 +22,6 @@ vim.opt.showmode = false
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
 end)
-
 -- Enable break indent
 vim.opt.breakindent = true
 
@@ -116,6 +115,22 @@ vim.api.nvim_create_autocmd('VimEnter', {
   highlight Normal ctermbg=none
   highlight NonText ctermbg=none
 ]]
+  end,
+})
+
+-- prettier shit
+vim.api.nvim_create_autocmd('BufWritePre', {
+  pattern = { '*.js', '*.jsx', '*.ts', '*.tsx', '*.css', '*.scss', '*.json', '*.md' },
+  callback = function()
+    vim.lsp.buf.format()
+  end,
+})
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'css', 'scss', 'json', 'markdown' },
+  callback = function()
+    vim.opt_local.tabstop = 2 -- 2 spaces for a tab
+    vim.opt_local.shiftwidth = 2 -- 2 spaces for autoindent
+    vim.opt_local.expandtab = true -- Use spaces
   end,
 })
 
@@ -288,22 +303,102 @@ require('lazy').setup({
     end,
   },
   {
+    'jose-elias-alvarez/null-ls.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function()
+      local null_ls = require 'null-ls'
+
+      null_ls.setup {
+        sources = {
+          null_ls.builtins.formatting.prettier.with {
+            filetypes = {
+              'javascript',
+              'javascriptreact',
+              'typescript',
+              'typescriptreact',
+              'css',
+              'scss',
+              'html',
+              'json',
+              'yaml',
+              'markdown',
+              'graphql',
+              'md',
+              'txt',
+            },
+          },
+        },
+      }
+    end,
+  },
+  {
     'nvim-tree/nvim-tree.lua',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
-      require('nvim-tree').setup {
-        sort = {
-          sorter = 'case_sensitive',
+      vim.keymap.set('n', '<leader>\\', function()
+        require('nvim-tree.api').tree.toggle { focus = true }
+      end, { desc = 'Toggle NvimTree on the right' })
+      if vim.api.nvim_win_get_width(0) <= 76 then
+        require('nvim-tree').setup {
+          sort = {
+            sorter = 'case_sensitive',
+          },
+          view = {
+            width = 18,
+            side = 'right',
+          },
+          renderer = {
+            group_empty = true,
+          },
+          filters = {
+            dotfiles = true,
+          },
+        }
+      else
+        require('nvim-tree').setup {
+          sort = {
+            sorter = 'case_sensitive',
+          },
+          view = {
+            width = 30,
+            side = 'right',
+          },
+          renderer = {
+            group_empty = true,
+          },
+          filters = {
+            dotfiles = true,
+          },
+        }
+      end
+    end,
+  },
+  {
+    'L3MON4D3/LuaSnip',
+    dependencies = { 'rafamadriz/friendly-snippets' }, -- Optional: pre-defined snippets
+    config = function()
+      require('luasnip.loaders.from_vscode').lazy_load() -- Load VSCode-style snippets
+    end,
+  },
+  {
+    'hrsh7th/nvim-cmp',
+    dependencies = { 'hrsh7th/cmp-buffer', 'hrsh7th/cmp-nvim-lsp', 'saadparwaiz1/cmp_luasnip' },
+    config = function()
+      local cmp = require 'cmp'
+      cmp.setup {
+        snippet = {
+          expand = function(args)
+            require('luasnip').lsp_expand(args.body)
+          end,
         },
-        view = {
-          width = 30,
-          side = 'right',
+        mapping = cmp.mapping.preset.insert {
+          ['<C-Space>'] = cmp.mapping.complete(),
+          ['<C-y>'] = cmp.mapping.confirm { select = true },
         },
-        renderer = {
-          group_empty = true,
-        },
-        filters = {
-          dotfiles = true,
+        sources = cmp.config.sources {
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' },
+          { name = 'buffer' },
         },
       }
     end,
