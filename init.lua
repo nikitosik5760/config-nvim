@@ -92,6 +92,29 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- JS keybindings
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'javascript',
+  callback = function()
+    vim.api.nvim_set_keymap('n', '<leader>R', ':!node %<CR>', { noremap = true, silent = true, desc = '[R]un current fi;e' })
+  end,
+})
+-- Racket keybindings
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'racket',
+  callback = function()
+    vim.api.nvim_set_keymap('n', '<leader>R', ':!racket %<CR>', { noremap = true, silent = true, desc = '[R]un current fi;e' })
+    vim.api.nvim_set_keymap('n', '<leader>e', ':!raco test %<CR>', { noremap = true, silent = true, desc = '[T]est current file' })
+    vim.diagnostic.config {
+      virtual_text = {
+        format = function(diagnostic)
+          return diagnostic.message:gsub('^.+:(%d+):(%d+): ', '')
+        end,
+      },
+    }
+  end,
+})
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -527,6 +550,7 @@ require('lazy').setup({
       { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
+      'jeapostrophe/racket-langserver',
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
@@ -704,6 +728,7 @@ require('lazy').setup({
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for ts_ls)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            require('lspconfig').racket_langserver.setup {}
             require('lspconfig')[server_name].setup(server)
           end,
         },
