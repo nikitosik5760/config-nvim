@@ -1,6 +1,7 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
+vim.g.undotree_DiffCommand = 'FC'
 
 -- disable default explorer
 vim.g.loaded_netrw = 1
@@ -406,6 +407,10 @@ require('lazy').setup({
   {
     'tpope/vim-fugitive',
     vim.keymap.set('n', '<leader>G', ':Git<CR>', { desc = '[G]it open' }),
+  },
+  {
+    'mbbill/undotree',
+    vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle, { desc = 'toggle [u]ndo tree' }),
   },
   {
     'hrsh7th/nvim-cmp',
