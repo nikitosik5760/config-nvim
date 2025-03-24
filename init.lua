@@ -381,6 +381,10 @@ require('lazy').setup({
     end,
   },
   {
+    'tpope/vim-fugitive',
+    vim.keymap.set('n', '<leader>G', ':Git<CR>', { desc = '[G]it open' }),
+  },
+  {
     'hrsh7th/nvim-cmp',
     dependencies = { 'hrsh7th/cmp-buffer', 'hrsh7th/cmp-nvim-lsp', 'saadparwaiz1/cmp_luasnip' },
     config = function()
