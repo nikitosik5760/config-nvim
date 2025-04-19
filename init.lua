@@ -97,9 +97,18 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'javascript',
   callback = function()
-    vim.api.nvim_set_keymap('n', '<leader>R', ':!node %<CR>', { noremap = true, silent = true, desc = '[R]un current fi;e' })
+    vim.api.nvim_set_keymap('n', '<leader>R', ':!node %<CR>', { noremap = true, silent = true, desc = '[R]un current file' })
   end,
 })
+
+-- Python keybindings
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'python',
+  callback = function()
+    vim.api.nvim_set_keymap('n', '<leader>R', ':!python %<CR>', { noremap = true, silent = true, desc = '[R]un current file' })
+  end,
+})
+
 -- Racket keybindings
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'racket',
@@ -129,19 +138,19 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
-
--- MAKE TRANSPARENT BACKGROUND
-vim.api.nvim_create_autocmd('VimEnter', {
-  callback = function()
-    vim.cmd [[
-  highlight Normal guibg=none
-  highlight NonText guibg=none
-  highlight Normal ctermbg=none
-  highlight NonText ctermbg=none
-]]
-  end,
-})
-
+--
+-- -- MAKE TRANSPARENT BACKGROUND
+-- vim.api.nvim_create_autocmd('VimEnter', {
+--   callback = function()
+--     vim.cmd [[
+--   highlight Normal guibg=none
+--   highlight NonText guibg=none
+--   highlight Normal ctermbg=none
+--   highlight NonText ctermbg=none
+-- ]]
+--   end,
+-- })
+--
 -- prettier shit
 vim.api.nvim_create_autocmd('BufWritePre', {
   pattern = { '*.js', '*.jsx', '*.ts', '*.tsx', '*.css', '*.scss', '*.json', '*.md' },
@@ -334,7 +343,7 @@ require('lazy').setup({
 
       null_ls.setup {
         sources = {
-          null_ls.builtins.formatting.prettier.with {
+          null_ls.builtins.formatting.prettierd.with {
             filetypes = {
               'javascript',
               'javascriptreact',
@@ -407,6 +416,7 @@ require('lazy').setup({
   {
     'tpope/vim-fugitive',
     vim.keymap.set('n', '<leader>G', ':Git<CR>', { desc = '[G]it open' }),
+    vim.keymap.set('n', '<leader>P', ':Git! push<CR>', { desc = 'git [P]ush' }),
   },
   {
     'mbbill/undotree',
