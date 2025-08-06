@@ -70,10 +70,6 @@ vim.keymap.set('n', '<leader>pv', ':Ex<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
--- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
--- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
--- is not what someone will guess without a bit more experience.
---
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
@@ -92,38 +88,6 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
--- JS keybindings
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'javascript',
-  callback = function()
-    vim.api.nvim_set_keymap('n', '<leader>R', ':!node %<CR>', { noremap = true, silent = true, desc = '[R]un current file' })
-  end,
-})
-
--- Python keybindings
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'python',
-  callback = function()
-    vim.api.nvim_set_keymap('n', '<leader>R', ':!python %<CR>', { noremap = true, silent = true, desc = '[R]un current file' })
-  end,
-})
-
--- Racket keybindings
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'racket',
-  callback = function()
-    vim.api.nvim_set_keymap('n', '<leader>R', ':!racket %<CR>', { noremap = true, silent = true, desc = '[R]un current fi;e' })
-    vim.api.nvim_set_keymap('n', '<leader>e', ':!raco test %<CR>', { noremap = true, silent = true, desc = '[T]est current file' })
-    vim.diagnostic.config {
-      virtual_text = {
-        format = function(diagnostic)
-          return diagnostic.message:gsub('^.+:(%d+):(%d+): ', '')
-        end,
-      },
-    }
-  end,
-})
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -150,8 +114,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- ]]
 --   end,
 -- })
---
--- prettier shit
+
+-- Prettier config
 vim.api.nvim_create_autocmd('BufWritePre', {
   pattern = { '*.js', '*.jsx', '*.ts', '*.tsx', '*.css', '*.scss', '*.json', '*.md' },
   callback = function()
@@ -183,18 +147,9 @@ vim.opt.rtp:prepend(lazypath)
 --  To update plugins you can run
 --    :Lazy update
 --
--- NOTE: Here is where you install your plugins.
-require('lazy').setup({
-  -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
+require('lazy').setup {
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
-  -- NOTE: Plugins can also be added by using a table,
-  -- with the first argument being the link and the following
-  -- keys can be used to configure plugin behavior/loading/etc.
-  --
-  -- Use `opts = {}` to force a plugin to be loaded.
-  --
-  -- See `:help gitsigns` to understand what the configuration keys do
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -412,11 +367,6 @@ require('lazy').setup({
     config = function()
       require('luasnip.loaders.from_vscode').lazy_load() -- Load VSCode-style snippets
     end,
-  },
-  {
-    'tpope/vim-fugitive',
-    vim.keymap.set('n', '<leader>G', ':Git<CR>', { desc = '[G]it open' }),
-    vim.keymap.set('n', '<leader>P', ':Git! push<CR>', { desc = 'git [P]ush' }),
   },
   {
     'mbbill/undotree',
@@ -687,21 +637,15 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        -- See `:help lspconfig-all` for a list of all the pre-configured LSPs
+        clangd = {},
         gopls = {},
+        omnisharp = {},
         pyright = {},
-        -- rust_analyzer = {},
-        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         html = {},
         cssls = {},
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        -- https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`ts_ls`) will work just fine
         ts_ls = {},
         sqlls = {},
-
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -712,7 +656,7 @@ require('lazy').setup({
                 callSnippet = 'Replace',
               },
               -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-              -- diagnostics = { disable = { 'missing-fields' } },
+              diagnostics = { disable = { 'missing-fields' } },
             },
           },
         },
@@ -993,17 +937,7 @@ require('lazy').setup({
     },
   },
 
-  -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
-  -- init.lua. If you want these files, they are in the repository, so you can just download them and
-  -- place them in the correct locations.
-
-  -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
-  --
-  --  Here are some example plugins that I've included in the Kickstart repository.
-  --  Uncomment any of the lines below to enable them (you will need to restart nvim).
-  --
   require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.neo-tree',
@@ -1011,35 +945,5 @@ require('lazy').setup({
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   { import = 'custom.plugins' },
-  --
-  -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
-  -- Or use telescope!
-  -- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
-  -- you can continue same window with `<space>sr` which resumes last telescope search
-}, {
-  -- ui = {
-  --   -- If you are using a Nerd Font: set icons to an empty table which will use the
-  --   -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
-  --   icons = vim.g.have_nerd_font and {} or {
-  --     cmd = '⌘',
-  --     config = '🛠',
-  --     event = '📅',
-  --     ft = '📂',
-  --     init = '⚙',
-  --     keys = '🗝',
-  --     plugin = '🔌',
-  --     runtime = '💻',
-  --     require = '🌙',
-  --     source = '📄',
-  --     start = '🚀',
-  --     task = '📌',
-  --     lazy = '💤 ',
-  --   },
-  -- },
-})
-
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
+}
