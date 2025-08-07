@@ -18,6 +18,15 @@ return {
     end,
   }),
 
+  -- C# keybindings
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'cs',
+    callback = function()
+      vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { desc = 'LSP Rename' })
+      vim.api.nvim_set_keymap('n', '<leader>R', ':!dotnet run<CR>', { desc = '[R]un current file' })
+    end,
+  }),
+
   -- Python keybindings
   vim.api.nvim_create_autocmd('FileType', {
     pattern = 'python',

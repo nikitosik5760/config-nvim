@@ -315,6 +315,11 @@ require('lazy').setup {
               'txt',
             },
           },
+          null_ls.builtins.formatting.csharpier.with {
+            command = 'csharpier',
+            args = { 'pipe-files' },
+            to_stdin = true,
+          },
         },
       }
     end,
@@ -640,7 +645,33 @@ require('lazy').setup {
         -- See `:help lspconfig-all` for a list of all the pre-configured LSPs
         clangd = {},
         gopls = {},
-        omnisharp = {},
+        omnisharp = {
+          cmd = {
+            'dotnet',
+            vim.fn.stdpath 'data' .. '/mason/packages/omnisharp/libexec/OmniSharp.dll',
+          },
+          root_dir = require('lspconfig.util').root_pattern('*.sln', '*.csproj'),
+          enable_import_completion = true,
+          organize_imports_on_format = true,
+          enable_roslyn_analyzers = true,
+          settings = {
+            FormattingOptions = {
+              EnableEditorConfigSupport = true,
+              OrganizeImports = true,
+            },
+            MsBuild = {
+              LoadProjectsOnDemand = true,
+            },
+            RoslynExtensionsOptions = {
+              EnableAnalyzersSupport = true,
+              EnableImportCompletion = true,
+              AnalyzeOpenDocumentsOnly = false,
+            },
+            Sdk = {
+              IncludePrereleases = true,
+            },
+          },
+        },
         pyright = {},
         html = {},
         cssls = {},
@@ -668,7 +699,12 @@ require('lazy').setup {
       --    :Mason
       --
       --  You can press `g?` for help in this menu.
-      require('mason').setup()
+      require('mason').setup {
+        registries = {
+          'github:mason-org/mason-registry',
+          'github:Crashdummyy/mason-registry',
+        },
+      }
 
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
