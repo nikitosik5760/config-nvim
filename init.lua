@@ -291,7 +291,7 @@ require('lazy').setup {
     end,
   },
   {
-    'jose-elias-alvarez/null-ls.nvim',
+    'nvimtools/none-ls.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
     config = function()
       local null_ls = require 'null-ls'
@@ -306,7 +306,7 @@ require('lazy').setup {
               'typescriptreact',
               'css',
               'scss',
-              'html',
+              -- 'html',
               'json',
               'yaml',
               'markdown',
@@ -371,6 +371,21 @@ require('lazy').setup {
     dependencies = { 'rafamadriz/friendly-snippets' }, -- Optional: pre-defined snippets
     config = function()
       require('luasnip.loaders.from_vscode').lazy_load() -- Load VSCode-style snippets
+      local ls = require 'luasnip'
+      local t = ls.t
+      local function copy(args)
+        return args[1]
+      end
+      ls.add_snippets('go', {
+        ls.s('errnil ', {
+          t { 'if err != nil' },
+          -- Linebreak
+          t { ' {', '\t' },
+          t { 'return nil, err' },
+          -- t { 'log.Fatal(err)' },
+          t { '', '}' },
+        }),
+      })
     end,
   },
   {
@@ -440,6 +455,7 @@ require('lazy').setup {
           file_ignore_patterns = {
             'node_modules',
             '.git',
+            '%__virtual.cs$',
           },
         },
         --  All the info you're looking for is in `:help telescope.setup()`
@@ -521,6 +537,8 @@ require('lazy').setup {
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
       'jeapostrophe/racket-langserver',
+
+      { 'seblyng/roslyn.nvim', opts = {} },
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
@@ -622,7 +640,9 @@ require('lazy').setup {
         for type, icon in pairs(signs) do
           diagnostic_signs[vim.diagnostic.severity[type]] = icon
         end
-        vim.diagnostic.config { signs = { text = diagnostic_signs } }
+        vim.diagnostic.config { virtual_text = {
+          source = 'always',
+        }, signs = { text = diagnostic_signs } }
       end
 
       -- LSP servers and clients are able to communicate to each other what features they support.
@@ -641,36 +661,28 @@ require('lazy').setup {
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      local rzls_path = vim.fn.stdpath 'data' .. '/mason/packages/rzls/libexec'
       local servers = {
         -- See `:help lspconfig-all` for a list of all the pre-configured LSPs
         clangd = {},
         gopls = {},
-        omnisharp = {
-          cmd = {
-            'dotnet',
-            vim.fn.stdpath 'data' .. '/mason/packages/omnisharp/libexec/OmniSharp.dll',
-          },
-          root_dir = require('lspconfig.util').root_pattern('*.sln', '*.csproj'),
-          enable_import_completion = true,
-          organize_imports_on_format = true,
-          enable_roslyn_analyzers = true,
-          settings = {
-            FormattingOptions = {
-              EnableEditorConfigSupport = true,
-              OrganizeImports = true,
-            },
-            MsBuild = {
-              LoadProjectsOnDemand = true,
-            },
-            RoslynExtensionsOptions = {
-              EnableAnalyzersSupport = true,
-              EnableImportCompletion = true,
-              AnalyzeOpenDocumentsOnly = false,
-            },
-            Sdk = {
-              IncludePrereleases = true,
-            },
-          },
+        roslyn = {
+          -- cmd = function()
+          --   local mason_registry = require 'mason-registry'
+          --
+          --   local rzls_path = vim.fn.expand '$MASON/packages/rzls/libexec'
+          --   local cmd = {
+          --     'roslyn',
+          --     '--stdio',
+          --     '--logLevel=Information',
+          --     '--extensionLogDirectory=' .. vim.fs.dirname(vim.lsp.get_log_path()),
+          --     '--razorSourceGenerator=' .. vim.fs.joinpath(rzls_path, 'Microsoft.CodeAnalysis.Razor.Compiler.dll'),
+          --     '--razorDesignTimePath=' .. vim.fs.joinpath(rzls_path, 'Targets', 'Microsoft.NET.Sdk.Razor.DesignTime.targets'),
+          --     '--extension',
+          --     vim.fs.joinpath(rzls_path, 'RazorExtension', 'Microsoft.VisualStudioCode.RazorExtension.dll'),
+          --   }
+          --   return cmd
+          -- end,
         },
         pyright = {},
         html = {},
@@ -769,7 +781,7 @@ require('lazy').setup {
         -- python = { "isort", "black" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
       },
     },
   },
@@ -900,6 +912,7 @@ require('lazy').setup {
     },
     opts = {}, -- your configuration
   },
+  { 'rose-pine/neovim' },
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
@@ -911,7 +924,7 @@ require('lazy').setup {
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-storm'
+      vim.cmd.colorscheme 'rose-pine-moon'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -933,7 +946,7 @@ require('lazy').setup {
       require('mini.ai').setup { n_lines = 500 }
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      -- - saiw)  [S]urround [A]dd [I]nner [W]ord [)]Paren
+      -- - saiw) [S]urround [A]dd [I]nner [W]ord [)]Paren
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
