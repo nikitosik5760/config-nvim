@@ -666,29 +666,11 @@ require('lazy').setup {
         -- See `:help lspconfig-all` for a list of all the pre-configured LSPs
         clangd = {},
         gopls = {},
-        roslyn = {
-          -- cmd = function()
-          --   local mason_registry = require 'mason-registry'
-          --
-          --   local rzls_path = vim.fn.expand '$MASON/packages/rzls/libexec'
-          --   local cmd = {
-          --     'roslyn',
-          --     '--stdio',
-          --     '--logLevel=Information',
-          --     '--extensionLogDirectory=' .. vim.fs.dirname(vim.lsp.get_log_path()),
-          --     '--razorSourceGenerator=' .. vim.fs.joinpath(rzls_path, 'Microsoft.CodeAnalysis.Razor.Compiler.dll'),
-          --     '--razorDesignTimePath=' .. vim.fs.joinpath(rzls_path, 'Targets', 'Microsoft.NET.Sdk.Razor.DesignTime.targets'),
-          --     '--extension',
-          --     vim.fs.joinpath(rzls_path, 'RazorExtension', 'Microsoft.VisualStudioCode.RazorExtension.dll'),
-          --   }
-          --   return cmd
-          -- end,
-        },
         pyright = {},
         html = {},
         cssls = {},
         ts_ls = {},
-        sqlls = {},
+        -- sqlls = {},
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },

@@ -2,6 +2,25 @@ return {
   -- Terminal shortcut
   vim.keymap.set('n', '<leader>t', ':terminal<CR>'),
 
+  -- C shortcut
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'c', 'cpp' },
+    callback = function()
+      vim.keymap.set('n', '<leader>R', function()
+        local file = vim.fn.expand '%:p'
+        local out_dir = './tmp'
+        local out_file = out_dir .. '/a.out'
+
+        if vim.fn.isdirectory(out_dir) then
+          vim.fn.mkdir(out_dir, 'p')
+        end
+
+        local cmd = string.format('g++ -Wall -pedantic %s -o %s && %s', file, out_file, out_file)
+        vim.cmd('!' .. cmd)
+      end, { buffer = true, noremap = true, silent = true, desc = '[R]un current file' })
+    end,
+  }),
+
   -- Copy file name
   vim.keymap.set('n', '<leader>Y', function()
     local filepath = vim.fn.expand '%'
